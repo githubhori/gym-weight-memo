@@ -19,9 +19,19 @@ npx serve
 
 ## 公開（GitHub Pages）
 
-1. Public リポジトリを作って push する。
-2. GitHub の Settings → Pages で、公開するブランチ（`main`、フォルダは `/ (root)`）を選ぶ。
-3. Pixel の Chrome で公開URLを開き、「ホーム画面に追加」する。
+1. GitHub で Public リポジトリ `gym-weight-memo` を作る（「Add a README」などは**チェックしない**＝空のまま作る）。
+2. push する。`index.html` があるこのフォルダに移動してから、次のコマンドを実行する（`<ユーザー名>` は自分の GitHub ユーザー名に置き換える）。
+
+   ```
+   cd <このフォルダのパス>
+   git branch -M main
+   git remote add origin https://github.com/<ユーザー名>/gym-weight-memo.git
+   git push -u origin main
+   ```
+
+   初回はブラウザが開き、GitHub のログイン認証を求められることがあります。
+3. GitHub の Settings → Pages で、Source を「Deploy from a branch」、Branch を `main`、フォルダを `/ (root)` にして Save する。1〜数分で公開される。
+4. 公開URL `https://<ユーザー名>.github.io/gym-weight-memo/` を Pixel の Chrome で開き、「ホーム画面に追加」する。
 
 ## 更新したとき（重要）
 
