@@ -74,7 +74,7 @@ svg { display: block; }
 }
 .row:active { background: color-mix(in srgb, var(--fg) 12%, transparent); }
 .row-name {
-  font-size: var(--fs-list-name); font-weight: 700; line-height: 1.2;
+  font-size: var(--list-name-fit, var(--fs-list-name)); font-weight: 700; line-height: 1.2;
   word-break: auto-phrase; overflow-wrap: anywhere;
 }
 .row-sub {

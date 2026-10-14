@@ -79,6 +79,19 @@
     }
   }
 
+  // 一覧のマシン名: 端末の文字サイズ設定で拡大されても、全角10文字が1行に収まるようにする。
+  // 実際の描画幅を測り、収まらなければ基準サイズ(--fs-list-name)を縮める。
+  function fitListNames(view) {
+    var probe = h('span', { text: '国国国国国国国国国国', style:
+      'position:absolute;visibility:hidden;white-space:nowrap;font-weight:700;font-size:var(--fs-list-name)' });
+    view.appendChild(probe);
+    var avail = view.clientWidth - 40; // 行の左右余白 20px ずつ
+    var w = probe.getBoundingClientRect().width;
+    probe.remove();
+    if (w > avail) view.style.setProperty('--list-name-fit', 'calc(var(--fs-list-name) * ' + (avail / w * 0.98).toFixed(4) + ')');
+    else view.style.removeProperty('--list-name-fit');
+  }
+
   function runRefits() { refits.forEach(function (f) { f(); }); }
   window.addEventListener('resize', runRefits);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(runRefits);
@@ -168,7 +181,11 @@
         ));
       });
     }
-    mount(h('div', { class: 'list-view' }, header, body));
+    var view = h('div', { class: 'list-view' }, header, body);
+    mount(view);
+    var fit = function () { fitListNames(view); };
+    fit();
+    refits.push(fit);
   }
 
   // ---------- 詳細 ----------
