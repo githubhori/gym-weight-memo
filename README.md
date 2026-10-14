@@ -5,11 +5,17 @@
 
 ## ローカルで確認する
 
+Node.js が必要です。`index.html` があるこのフォルダに移動してから実行します（別のフォルダで実行するとアプリは表示されません）。
+
 ```
-python -m http.server 8000
+cd <このフォルダのパス>
+npx serve
 ```
 
-Chrome で `http://localhost:8000/` を開く（DevTools のデバイスモードで幅427pxも確認）。
+表示された URL（通常 `http://localhost:3000`）を Chrome で開く（DevTools のデバイスモードで幅427pxも確認）。
+
+確認が終わったら、`npx serve` を実行したターミナルで `Ctrl + C` を押すとサーバーが止まります（ターミナルを閉じても止まります）。
+停止後に `http://localhost:3000` を開いても、Service Worker が残っていれば、アプリはキャッシュから表示されます。完全に消したいときは、DevTools の Application タブ → Storage → 「Clear site data」を実行してください。
 
 ## 公開（GitHub Pages）
 
