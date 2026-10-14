@@ -8,8 +8,7 @@
 
   // 自動縮小の設定（基準サイズは style.css の変数と同じ値）
   var FIT = {
-    nameBase: 46, nameTwoLines: 42, nameMin: 28,
-    weightBase: 132, weightMin: 80, step: 2
+    nameBase: 46, nameTwoLines: 42, nameMin: 28, step: 2
   };
 
   // ---------- DOM ヘルパー ----------
@@ -80,16 +79,6 @@
     }
   }
 
-  // ウエイト: 1行固定。コンテナ幅に収まるまで縮小
-  function fitWeight(box, num) {
-    var size = FIT.weightBase;
-    num.style.fontSize = size + 'px';
-    while (box.scrollWidth > box.clientWidth && size > FIT.weightMin) {
-      size -= FIT.step;
-      num.style.fontSize = size + 'px';
-    }
-  }
-
   function runRefits() { refits.forEach(function (f) { f(); }); }
   window.addEventListener('resize', runRefits);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(runRefits);
@@ -114,6 +103,27 @@
     }
   }
 
+  // ---------- バナー（ダンベルのマーク＋タイトル） ----------
+  function banner() {
+    var yellow = 'var(--accent)';
+    var s = svg('svg', { class: 'banner', viewBox: '0 0 387 96', 'aria-hidden': 'true' });
+    // ホーム画面アイコンと同じ形のダンベル（100x100 の枠を 0.92 倍）
+    var g = svg('g', { transform: 'translate(0 2) scale(0.92)', fill: yellow });
+    g.appendChild(svg('rect', { x: 28, y: 46, width: 44, height: 8 }));
+    [[8, 30, 12, 40], [20, 22, 12, 56], [68, 22, 12, 56], [80, 30, 12, 40]].forEach(function (r) {
+      g.appendChild(svg('rect', { x: r[0], y: r[1], width: r[2], height: r[3], rx: 3 }));
+    });
+    s.appendChild(g);
+    function label(txt, y, size, fill, spacing) {
+      var t = svg('text', { x: 104, y: y, 'font-size': size, 'font-weight': 900, fill: fill, 'letter-spacing': spacing });
+      t.textContent = txt;
+      s.appendChild(t);
+    }
+    label('GYM', 52, 46, 'var(--fg)', 0);
+    label('WEIGHT MEMO', 82, 24, yellow, 3);
+    return s;
+  }
+
   // ---------- 一覧 ----------
   function backupStale() {
     if (!Store.getMachines().length) return false;
@@ -125,7 +135,7 @@
   function viewList() {
     var machines = Store.getMachines();
     var header = h('div', { class: 'list-header' },
-      h('h1', { class: 'app-title', text: 'ジムウエイトメモ' }),
+      h('h1', { class: 'app-title', 'aria-label': 'Gym Weight Memo' }, banner()),
       h('div', { class: 'nav' },
         h('a', { class: 'btn', href: '#/history', text: '履歴' }),
         h('a', { class: 'btn', href: '#/edit', text: '編集' }),
@@ -165,25 +175,19 @@
   function viewDetail(id) {
     var m = Store.getMachine(id);
     if (!m) { location.replace('#/'); return; }
-    var w = Store.currentWeight(id);
-
     var nameEl = h('h1', { class: 'detail-name', text: m.name });
-    var numEl = h('span', { class: 'num', text: w == null ? '未設定' : Store.formatWeight(w) });
-    var weightBox = h('div', { class: 'detail-weight' }, numEl,
-      w == null ? null : h('span', { class: 'unit', text: 'kg' }));
 
     var view = h('div', { class: 'detail-view' },
       h('a', { class: 'btn back-btn', href: '#/' }, icon('left'), '一覧に戻る'),
       h('div', { class: 'detail-head' }, nameEl,
         m.muscle ? h('div', { class: 'detail-muscle', text: m.muscle }) : null),
-      weightBox,
       h('div', { class: 'memo-box' },
         h('div', { class: 'memo-label', text: 'メモ' }),
         h('div', { class: 'memo-text', text: m.memo }))
     );
     mount(view);
 
-    var fit = function () { fitName(nameEl); fitWeight(weightBox, numEl); };
+    var fit = function () { fitName(nameEl); };
     fit();
     refits.push(fit);
   }

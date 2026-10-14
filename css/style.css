@@ -10,20 +10,17 @@
   --font: system-ui, "Noto Sans JP", "Noto Sans CJK JP", sans-serif;
 
   /* 一覧画面 */
-  --fs-app-title: 30px;
   --fs-nav: 20px;
-  --fs-list-name: 44px;
+  --fs-list-name: 38px; /* 全角10文字が1行に収まる大きさ（427px幅） */
   --fs-list-muscle: 30px;
   --fs-list-weight: 44px;
   --fs-list-unit: 20px;
 
-  /* 詳細画面（name / weight は JS が自動縮小する。基準値は app.js の定数） */
+  /* 詳細画面（マシン名は JS が自動縮小する。基準値は app.js の FIT） */
   --fs-back: 26px;
   --fs-detail-name: 46px;
   --fs-detail-muscle: 28px;
-  --fs-detail-weight: 132px;
-  --fs-detail-unit: 52px;
-  --fs-memo: 36px;
+  --fs-memo: 28px; /* 対象筋肉と同じ大きさ */
   --fs-memo-label: 20px;
 
   /* 編集・履歴・バックアップ画面 */
@@ -60,7 +57,8 @@ svg { display: block; }
 /* ===== 一覧画面 ===== */
 .list-view { padding: 40px 0 28px; }
 .list-header { padding: 0 20px 16px; }
-.app-title { margin: 0 0 14px; font-size: var(--fs-app-title); font-weight: 800; }
+.app-title { margin: 0 0 14px; }
+.banner { display: block; width: 100%; height: auto; font-family: var(--font); }
 .nav { display: flex; gap: 10px; }
 .nav .btn { height: 56px; font-size: var(--fs-nav); }
 .nav .btn:nth-child(1), .nav .btn:nth-child(2) { flex: 1 1 0; min-width: 0; }
@@ -109,19 +107,8 @@ svg { display: block; }
   margin-top: 6px; font-size: var(--fs-detail-muscle); color: var(--muted);
   overflow-wrap: anywhere;
 }
-.detail-weight {
-  flex: none; padding: 0 20px; margin-top: 8px;
-  display: flex; align-items: baseline; white-space: nowrap; overflow: hidden;
-}
-.detail-weight .num {
-  font-size: var(--fs-detail-weight); font-weight: 800; letter-spacing: -2px;
-  line-height: 1.1; color: var(--accent);
-}
-.detail-weight .unit {
-  font-size: var(--fs-detail-unit); font-weight: 700; margin-left: 12px; line-height: 1;
-}
 .memo-box {
-  flex: 1 1 0; min-height: 0; margin: 12px 20px 0; padding: 16px;
+  flex: 1 1 0; min-height: 0; margin: 20px 20px 0; padding: 16px;
   border: 2px solid var(--line); border-radius: 16px;
   overflow-y: auto; overscroll-behavior: contain;
 }

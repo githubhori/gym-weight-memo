@@ -1,6 +1,6 @@
 {
-  "name": "ジムウエイトメモ",
-  "short_name": "ウエイトメモ",
+  "name": "Gym Weight Memo",
+  "short_name": "Weight Memo",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
