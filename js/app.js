@@ -6,10 +6,9 @@
   var NS = 'http://www.w3.org/2000/svg';
   var BACKUP_WARN_DAYS = 30;
 
-  // 自動縮小の設定（基準サイズは style.css の変数と同じ値）
-  var FIT = {
-    nameBase: 46, nameTwoLines: 42, nameMin: 28, step: 2
-  };
+  // マシン名は全角 NAME_CHARS 文字が1行に収まる大きさにする（style.css の --fs-*-name が上限）
+  var NAME_CHARS = 11;
+  var NAME_MIN_SCALE = 0.75;
 
   // ---------- DOM ヘルパー ----------
   function h(tag, attrs) {
@@ -62,34 +61,31 @@
   // ---------- 自動縮小 ----------
   var refits = [];
 
-  function lineCount(el, fontSize, lineHeight) {
-    return Math.round(el.getBoundingClientRect().height / (fontSize * lineHeight));
-  }
-
-  // マシン名: 1行なら基準、収まらなければ42pxで2行まで、さらに収まらなければ縮小
-  function fitName(el) {
-    var size = FIT.nameBase;
-    el.style.fontSize = size + 'px';
-    if (lineCount(el, size, 1.15) <= 1) return;
-    size = FIT.nameTwoLines;
-    el.style.fontSize = size + 'px';
-    while (lineCount(el, size, 1.15) > 2 && size > FIT.nameMin) {
-      size -= FIT.step;
-      el.style.fontSize = size + 'px';
-    }
-  }
-
-  // 一覧のマシン名: 端末の文字サイズ設定で拡大されても、全角10文字が1行に収まるようにする。
-  // 実際の描画幅を測り、収まらなければ基準サイズ(--fs-list-name)を縮める。
-  function fitListNames(view) {
-    var probe = h('span', { text: '国国国国国国国国国国', style:
-      'position:absolute;visibility:hidden;white-space:nowrap;font-weight:700;font-size:var(--fs-list-name)' });
-    view.appendChild(probe);
-    var avail = view.clientWidth - 40; // 行の左右余白 20px ずつ
+  // 全角 NAME_CHARS 文字を実際に描画して幅を測り、avail に収まる倍率（最大1）を返す。
+  // 端末の文字サイズ設定で拡大されていても、実測なので正しく補正できる。
+  function fitScale(host, sizeVar, weight, avail) {
+    var probe = h('span', { text: new Array(NAME_CHARS + 1).join('国'), style:
+      'position:absolute;visibility:hidden;white-space:nowrap;font-weight:' + weight + ';font-size:var(' + sizeVar + ')' });
+    host.appendChild(probe);
     var w = probe.getBoundingClientRect().width;
     probe.remove();
-    if (w > avail) view.style.setProperty('--list-name-fit', 'calc(var(--fs-list-name) * ' + (avail / w * 0.98).toFixed(4) + ')');
-    else view.style.removeProperty('--list-name-fit');
+    return w > avail ? avail / w * 0.98 : 1;
+  }
+
+  // 詳細画面のマシン名: 1行 NAME_CHARS 文字。長い名前は2行まで折り返し、3行以上なら更に縮小
+  function fitName(el) {
+    var scale = fitScale(el.parentNode, '--fs-detail-name', 800, el.clientWidth);
+    var min = scale * NAME_MIN_SCALE;
+    function apply() { el.style.setProperty('--name-scale', scale.toFixed(4)); }
+    function lines() { return Math.round(el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight)); }
+    apply();
+    while (lines() > 2 && scale > min) { scale -= 0.03; apply(); }
+  }
+
+  // 一覧のマシン名と対象筋肉: 同じ倍率で縮める（筋肉名が常にマシン名より小さくなる）
+  function fitListNames(view) {
+    var scale = fitScale(view, '--fs-list-name', 700, view.clientWidth - 40); // 行の左右余白 20px ずつ
+    view.style.setProperty('--list-scale', scale.toFixed(4));
   }
 
   function runRefits() { refits.forEach(function (f) { f(); }); }

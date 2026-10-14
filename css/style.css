@@ -11,14 +11,14 @@
 
   /* 一覧画面 */
   --fs-nav: 20px;
-  --fs-list-name: 38px; /* 全角10文字が1行に収まる大きさ（427px幅） */
-  --fs-list-muscle: 30px;
+  --fs-list-name: 35px; /* 全角11文字が1行に収まる大きさ（427px幅） */
+  --fs-list-muscle: 28px; /* マシン名より小さく */
   --fs-list-weight: 44px;
   --fs-list-unit: 20px;
 
-  /* 詳細画面（マシン名は JS が自動縮小する。基準値は app.js の FIT） */
+  /* 詳細画面（マシン名は JS が自動縮小する。11文字の基準は app.js の NAME_CHARS） */
   --fs-back: 26px;
-  --fs-detail-name: 46px;
+  --fs-detail-name: 35px; /* 全角11文字が1行に収まる大きさ（427px幅） */
   --fs-detail-muscle: 28px;
   --fs-memo: 28px; /* 対象筋肉と同じ大きさ */
   --fs-memo-label: 20px;
@@ -74,7 +74,7 @@ svg { display: block; }
 }
 .row:active { background: color-mix(in srgb, var(--fg) 12%, transparent); }
 .row-name {
-  font-size: var(--list-name-fit, var(--fs-list-name)); font-weight: 700; line-height: 1.2;
+  font-size: calc(var(--fs-list-name) * var(--list-scale, 1)); font-weight: 700; line-height: 1.2;
   word-break: auto-phrase; overflow-wrap: anywhere;
 }
 .row-sub {
@@ -83,7 +83,7 @@ svg { display: block; }
 }
 .row-muscle {
   flex: 1 1 auto; min-width: 0;
-  font-size: var(--fs-list-muscle); line-height: 1.2; color: var(--muted);
+  font-size: calc(var(--fs-list-muscle) * var(--list-scale, 1)); line-height: 1.2; color: var(--muted);
   overflow-wrap: anywhere;
 }
 .row-weight { flex: none; white-space: nowrap; }
@@ -100,7 +100,7 @@ svg { display: block; }
 .back-btn svg { width: 30px; height: 30px; }
 .detail-head { flex: none; padding: 20px 20px 0; }
 .detail-name {
-  margin: 0; font-size: var(--fs-detail-name); font-weight: 800; line-height: 1.15;
+  margin: 0; font-size: calc(var(--fs-detail-name) * var(--name-scale, 1)); font-weight: 800; line-height: 1.15;
   overflow-wrap: anywhere;
 }
 .detail-muscle {
