@@ -104,7 +104,7 @@
       case 'm': return viewDetail(id);
       case 'edit':
         if (id === 'new') return viewForm(null);
-        if (id) return viewForm(id);
+        if (id) return viewForm(id, parts[2] === 'm'); // #/edit/<id>/m = 詳細画面から開いた編集
         return viewEdit();
       case 'history': return id ? viewHistoryOf(id) : viewHistoryPick();
       case 'backup': return viewBackup();
@@ -193,7 +193,9 @@
     var view = h('div', { class: 'detail-view' },
       h('a', { class: 'btn back-btn', href: '#/' }, icon('left'), '一覧に戻る'),
       h('div', { class: 'detail-head' }, nameEl,
-        m.muscle ? h('div', { class: 'detail-muscle', text: m.muscle }) : null),
+        h('div', { class: 'detail-sub' },
+          h('div', { class: 'detail-muscle', text: m.muscle }),
+          h('a', { class: 'btn detail-edit', href: '#/edit/' + encodeURIComponent(m.id) + '/m', text: '編集' }))),
       h('div', { class: 'memo-box' },
         h('div', { class: 'memo-label', text: 'メモ' }),
         h('div', { class: 'memo-text', text: m.memo }))
@@ -255,9 +257,18 @@
     return { value: v };
   }
 
-  function viewForm(id) {
+  // fromDetail: 詳細画面から開いた編集。保存・キャンセル後は詳細画面に戻る。
+  function viewForm(id, fromDetail) {
     var m = id ? Store.getMachine(id) : null;
     if (id && !m) { location.replace('#/edit'); return; }
+    var backHash = fromDetail ? '#/m/' + encodeURIComponent(id) : '#/edit';
+
+    // 詳細画面から来たときは履歴を1つ戻る（同じ画面が履歴に二重に残らないように）
+    function leave() {
+      if (fromDetail && history.length > 1) history.back();
+      else location.replace(backHash);
+    }
+    function onBack(e) { e.preventDefault(); leave(); }
     var cur = m ? Store.currentWeight(m.id) : null;
 
     var name = h('input', { id: 'f-name', type: 'text', value: m ? m.name : '', autocomplete: 'off' });
@@ -282,11 +293,11 @@
         showError(err, '保存できませんでした（端末の容量を確認してください）。');
         return;
       }
-      location.replace('#/edit');
+      leave();
     }
 
     mount(h('div', { class: 'page' },
-      h('div', { class: 'topbar' }, h('a', { class: 'btn', href: '#/edit' }, icon('left'), '戻る')),
+      h('div', { class: 'topbar' }, h('a', { class: 'btn', href: backHash, onclick: onBack }, icon('left'), '戻る')),
       h('h1', { text: m ? 'マシンを編集' : 'マシンを追加' }),
       h('form', { novalidate: true, onsubmit: function (e) { e.preventDefault(); submit(); } },
         h('div', { class: 'field' }, h('label', { for: 'f-name', text: 'マシン名（必須）' }), name),
@@ -295,7 +306,7 @@
         h('div', { class: 'field' }, h('label', { for: 'f-memo', text: 'メモ' }), memo),
         err,
         h('div', { class: 'form-actions' },
-          h('a', { class: 'btn', href: '#/edit', text: 'キャンセル' }),
+          h('a', { class: 'btn', href: backHash, onclick: onBack, text: 'キャンセル' }),
           h('button', { class: 'btn primary', type: 'submit', text: '保存' }))
       )
     ));
