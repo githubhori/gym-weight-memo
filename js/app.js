@@ -194,7 +194,6 @@
       h('a', { class: 'btn back-btn', href: '#/' }, icon('left'), '一覧に戻る'),
       h('div', { class: 'detail-head' }, nameEl,
         h('div', { class: 'detail-sub' },
-          h('div', { class: 'detail-muscle', text: m.muscle }),
           h('a', { class: 'btn detail-edit', href: '#/edit/' + encodeURIComponent(m.id) + '/m', text: '編集' }))),
       h('div', { class: 'memo-box' },
         h('div', { class: 'memo-label', text: 'メモ' }),

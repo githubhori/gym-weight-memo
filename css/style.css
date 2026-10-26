@@ -19,7 +19,6 @@
   /* 詳細画面（マシン名は JS が自動縮小する。11文字の基準は app.js の NAME_CHARS） */
   --fs-back: 26px;
   --fs-detail-name: 35px; /* 全角11文字が1行に収まる大きさ（427px幅） */
-  --fs-detail-muscle: 28px;
   --fs-memo: 28px; /* 対象筋肉と同じ大きさ */
   --fs-memo-label: 20px;
 
@@ -103,11 +102,7 @@ svg { display: block; }
   margin: 0; font-size: calc(var(--fs-detail-name) * var(--name-scale, 1)); font-weight: 800; line-height: 1.15;
   overflow-wrap: anywhere;
 }
-.detail-sub { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; }
-.detail-muscle {
-  flex: 1 1 auto; min-width: 0; font-size: var(--fs-detail-muscle); color: var(--muted);
-  overflow-wrap: anywhere;
-}
+.detail-sub { display: flex; justify-content: flex-end; margin-top: 10px; }
 .detail-edit { flex: none; height: 48px; padding: 0 20px; font-size: 22px; }
 .memo-box {
   flex: 1 1 0; min-height: 0; margin: 20px 20px 0; padding: 16px;
