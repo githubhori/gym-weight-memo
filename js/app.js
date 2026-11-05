@@ -106,7 +106,7 @@
         if (id === 'new') return viewForm(null);
         if (id) return viewForm(id, parts[2] === 'm'); // #/edit/<id>/m = 詳細画面から開いた編集
         return viewEdit();
-      case 'history': return id ? viewHistoryOf(id) : viewHistoryPick();
+      case 'history': return id ? viewHistoryOf(id, parts[2] === 'm') : viewHistoryPick(); // #/history/<id>/m = 詳細画面から開いた履歴
       case 'backup': return viewBackup();
       default: return viewList();
     }
@@ -194,7 +194,8 @@
       h('a', { class: 'btn back-btn', href: '#/' }, icon('left'), '一覧に戻る'),
       h('div', { class: 'detail-head' }, nameEl,
         h('div', { class: 'detail-sub' },
-          h('a', { class: 'btn detail-edit', href: '#/edit/' + encodeURIComponent(m.id) + '/m', text: '編集' }))),
+          h('a', { class: 'btn detail-btn', href: '#/history/' + encodeURIComponent(m.id) + '/m', text: '履歴' }),
+          h('a', { class: 'btn detail-btn', href: '#/edit/' + encodeURIComponent(m.id) + '/m', text: '編集' }))),
       h('div', { class: 'memo-box' },
         h('div', { class: 'memo-label', text: 'メモ' }),
         h('div', { class: 'memo-text', text: m.memo }))
@@ -362,9 +363,17 @@
     return s;
   }
 
-  function viewHistoryOf(id) {
+  // fromDetail: 詳細画面から開いた履歴。「戻る」は詳細画面へ戻る。
+  function viewHistoryOf(id, fromDetail) {
     var m = Store.getMachine(id);
     if (!m) { location.replace('#/history'); return; }
+    var backHash = fromDetail ? '#/m/' + encodeURIComponent(id) : '#/history';
+    // 詳細画面から来たときは履歴を1つ戻る（同じ画面が履歴に二重に残らないように）
+    function onBack(e) {
+      e.preventDefault();
+      if (fromDetail && history.length > 1) history.back();
+      else location.replace(backHash);
+    }
     var scroll = window.scrollY;
     var rows = Store.getHistory(id); // 新しい順
 
@@ -387,7 +396,7 @@
           h('td', { class: 'del' }, h('button', { class: 'btn danger', type: 'button', text: '削除', onclick: function () {
             if (!confirm(r.date + '（' + Store.formatWeight(r.weightKg) + ' kg）の記録を削除しますか？')) return;
             Store.deleteHistory(id, r.date);
-            viewHistoryOf(id);
+            viewHistoryOf(id, fromDetail);
           } }))
         ));
       });
@@ -397,7 +406,7 @@
     }
 
     mount(h('div', { class: 'page' },
-      h('div', { class: 'topbar' }, h('a', { class: 'btn', href: '#/history' }, icon('left'), '戻る')),
+      h('div', { class: 'topbar' }, h('a', { class: 'btn', href: backHash, onclick: onBack }, icon('left'), '戻る')),
       h('h1', { text: m.name }),
       chartArea,
       table
